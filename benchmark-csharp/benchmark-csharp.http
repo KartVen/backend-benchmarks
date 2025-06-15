@@ -1,0 +1,6 @@
+@benchmark_csharp_HostAddress = http://localhost:5225
+
+GET {{benchmark_csharp_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

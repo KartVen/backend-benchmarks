@@ -1,0 +1,7 @@
+# unified ignore
+.DS_Store
+*.log
+.env
+*.pyc
+__pycache__/
+*.swp

@@ -1,0 +1,25 @@
+services:
+  benchmark-python:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8083:8000"
+    environment:
+      - POSTGRES_DB=benchmark
+      - POSTGRES_USER=benchmark
+      - POSTGRES_PASSWORD=benchmark
+      - POSTGRES_HOST=db-python
+    depends_on:
+      - db-python
+    volumes:
+      - ./results/benchmark-python:/app/results
+
+  db-python:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: benchmark
+      POSTGRES_USER: benchmark
+      POSTGRES_PASSWORD: benchmark
+    ports:
+      - "5435:5432"

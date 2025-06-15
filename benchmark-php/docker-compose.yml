@@ -1,0 +1,28 @@
+services:
+  benchmark-php:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8084:80"
+    environment:
+      - DB_CONNECTION=pgsql
+      - DB_HOST=db-php
+      - DB_PORT=5432
+      - DB_DATABASE=benchmark
+      - DB_USERNAME=benchmark
+      - DB_PASSWORD=benchmark
+    depends_on:
+      - db-php
+    volumes:
+      - ./results/benchmark-php:/app/results
+
+  db-php:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: benchmark
+      POSTGRES_USER: benchmark
+      POSTGRES_PASSWORD: benchmark
+    ports:
+      - "5436:5432"
+

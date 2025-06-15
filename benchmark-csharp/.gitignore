@@ -1,0 +1,9 @@
+# build output
+bin/
+obj/
+out/
+*.DotSettings.user
+
+# Rider/VSCode
+.idea/
+.vscode/
