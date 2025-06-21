@@ -1,15 +1,18 @@
-from django.http import HttpResponse
+from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
+import json
 
 
 def ping(request):
     return HttpResponse("OK", content_type="text/plain")
 
+
+def error(request):
+    raise Exception("Simulated exception")
+
+
 def fibonacci(request):
-    try:
-        n = int(request.GET.get("n", 30))
-    except (TypeError, ValueError):
-        return HttpResponse("Invalid parameter", status=400, content_type="text/plain")
+    n = int(request.GET.get("n", 30))
 
     def fib(n):
         if n <= 1:
@@ -18,50 +21,59 @@ def fibonacci(request):
 
     return HttpResponse(str(fib(n)), content_type="text/plain")
 
-@csrf_exempt
-def create_person(request):
-    if request.method == "POST":
-        try:
-            data = json.loads(request.body)
-            person = Person.objects.create(name=data["name"], email=data["email"])
-            return JsonResponse({"id": person.id, "name": person.name, "email": person.email}, status=201)
-        except (KeyError, json.JSONDecodeError):
-            return JsonResponse({"error": "Invalid input"}, status=400)
+def fibonacci_iter(request):
+    n = int(request.GET.get("n", 30))
+    if n <= 1:
+        return HttpResponse(str(n))
+    a, b = 0, 1
+    for _ in range(2, n + 1):
+        a, b = b, a + b
+    return HttpResponse(str(b), content_type="text/plain")
 
-def get_all_persons(request):
-    if request.method == "GET":
-        persons = list(Person.objects.values("id", "name", "email"))
-        return JsonResponse(persons, safe=False)
+def fib(n):
+    if n == 1:
+        raise Exception("Error while processing")
+    if n <= 0:
+        return 0
+    return fib(n - 1) + fib(n - 2)
 
-def get_person(request, id):
-    if request.method == "GET":
-        try:
-            person = Person.objects.get(pk=id)
-            return JsonResponse({"id": person.id, "name": person.name, "email": person.email})
-        except Person.DoesNotExist:
-            return HttpResponse(status=404)
+def fibonacci_error(request):
+    n = int(request.GET.get("n", 30))
+    return HttpResponse(str(fib(n)), content_type="text/plain")
 
 @csrf_exempt
-def update_person(request, id):
-    if request.method == "PUT":
-        try:
-            person = Person.objects.get(pk=id)
-            data = json.loads(request.body)
-            person.name = data["name"]
-            person.email = data["email"]
-            person.save()
-            return JsonResponse({"id": person.id, "name": person.name, "email": person.email})
-        except Person.DoesNotExist:
-            return HttpResponse(status=404)
-        except (KeyError, json.JSONDecodeError):
-            return JsonResponse({"error": "Invalid input"}, status=400)
+def multiply_matrices_int(request):
+    data = json.loads(request.body)
+    A = data["a"]
+    B = data["b"]
+    n, m, k = len(A), len(A[0]), len(B[0])
+    result = [[0] * k for _ in range(n)]
+    for i in range(n):
+        for j in range(k):
+            for l in range(m):
+                result[i][j] += A[i][l] * B[l][j]
+    return JsonResponse(result, safe=False)
+
 
 @csrf_exempt
-def delete_person(request, id):
-    if request.method == "DELETE":
-        try:
-            person = Person.objects.get(pk=id)
-            person.delete()
-            return HttpResponse(status=204)
-        except Person.DoesNotExist:
-            return HttpResponse(status=404)
+def multiply_matrices_float(request):
+    data = json.loads(request.body)
+    A = data["a"]
+    B = data["b"]
+    n, m, k = len(A), len(A[0]), len(B[0])
+    result = [[0.0] * k for _ in range(n)]
+    for i in range(n):
+        for j in range(k):
+            for l in range(m):
+                result[i][j] += A[i][l] * B[l][j]
+    return JsonResponse(result, safe=False)
+
+
+@csrf_exempt
+def upload_json(request):
+    if request.method != "POST":
+        return HttpResponse(status=405)
+    gmail_count = sum(1 for p in json.loads(request.body) if "email" in p and "gmail.com" in p["email"])
+    return JsonResponse({
+        "gmailCount": gmail_count
+    })

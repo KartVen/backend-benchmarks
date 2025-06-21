@@ -2,11 +2,13 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace benchmark_csharp.Controllers;
 
-
 [ApiController]
-[Route("/ping")]
+[Route("")]
 public class HealthController : ControllerBase
 {
-    [HttpGet]
-    public IActionResult Ping() => Ok("OK");
+    [HttpGet("ping")]
+    public IActionResult Ping() => Content("OK", "text/plain");
+
+    [HttpGet("error")]
+    public IActionResult Error() => throw new Exception("Simulated exception");
 }

@@ -1,21 +1,29 @@
-FROM php:8.3-apache
+FROM php:8.3-fpm
 
-RUN apt-get update && apt-get install -y unzip git libpq-dev \
-    && docker-php-ext-install pdo pdo_pgsql
+RUN apt-get update -y && apt-get install -y \
+    nginx \
+    openssl \
+    zip \
+    unzip \
+    git \
+    curl \
+    libpq-dev \
+    libzip-dev && \
+    docker-php-ext-install pdo pdo_pgsql zip
 
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 WORKDIR /var/www/html
 COPY . .
 
-RUN composer install --no-interaction --no-plugins --no-scripts
+COPY www.conf /usr/local/etc/php-fpm.d/www.conf
 
-RUN chown -R www-data:www-data /var/www/html \
- && chmod -R 755 /var/www/html/storage /var/www/html/bootstrap/cache
+RUN composer install --no-dev --optimize-autoloader
 
-ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
-RUN a2enmod rewrite
-COPY default.conf /etc/apache2/sites-available/000-default.conf
+RUN php artisan config:cache && php artisan route:cache
 
-EXPOSE 80
-CMD ["apache2-foreground"]
+RUN echo "expose_php = Off" >> /usr/local/etc/php/php.ini
+
+COPY default.conf /etc/nginx/conf.d/default.conf
+
+CMD ["sh", "-c", "php-fpm & nginx -g 'daemon off;'"]

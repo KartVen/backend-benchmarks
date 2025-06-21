@@ -10,4 +10,9 @@ public class HealthController {
     public String ping() {
         return "OK";
     }
+
+    @GetMapping("/error")
+    public String error() {
+        throw new RuntimeException("Simulated exception");
+    }
 }
