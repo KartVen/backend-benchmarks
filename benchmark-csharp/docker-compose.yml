@@ -9,11 +9,12 @@ services:
       - ConnectionStrings__DefaultConnection=Host=db-csharp;Database=benchmark;Username=benchmark;Password=benchmark
     depends_on:
       - db-csharp
-    volumes:
-      - ./results/benchmark-csharp:/app/results
+    mem_limit: 4g
+    cpus: 3.0
 
   db-csharp:
     image: postgres:15
+    restart: always
     environment:
       POSTGRES_DB: benchmark
       POSTGRES_USER: benchmark

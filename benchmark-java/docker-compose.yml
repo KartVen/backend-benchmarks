@@ -11,11 +11,12 @@ services:
       - SPRING_DATASOURCE_PASSWORD=benchmark
     depends_on:
       - db-java
-    volumes:
-      - ./results/benchmark-java:/app/results
+    mem_limit: 4g
+    cpus: 3.0
 
   db-java:
     image: postgres:15
+    restart: always
     environment:
       POSTGRES_DB: benchmark
       POSTGRES_USER: benchmark

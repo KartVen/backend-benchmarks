@@ -1,18 +1,29 @@
 server:
   port: 8080
+  server-header: ""
+  tomcat:
+    max-threads: 8
 
 spring:
   application:
     name: benchmark
   datasource:
-    url: jdbc:postgresql://localhost:5432/benchmark
+    url: jdbc:postgresql://localhost:5433/benchmark
     username: benchmark
     password: benchmark
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: create-drop
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
-        format_sql: true
+        format_sql: false
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+logging:
+  level:
+    root: ERROR
+    org.springframework.web: ERROR
+    org.hibernate.SQL: OFF
+    org.hibernate.type.descriptor.sql: OFF

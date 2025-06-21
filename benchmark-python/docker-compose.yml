@@ -10,13 +10,15 @@ services:
       - POSTGRES_USER=benchmark
       - POSTGRES_PASSWORD=benchmark
       - POSTGRES_HOST=db-python
+      - POSTGRES_PORT=5432
     depends_on:
       - db-python
-    volumes:
-      - ./results/benchmark-python:/app/results
+    mem_limit: 4g
+    cpus: 3.0
 
   db-python:
     image: postgres:15
+    restart: always
     environment:
       POSTGRES_DB: benchmark
       POSTGRES_USER: benchmark
